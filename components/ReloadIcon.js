@@ -1,15 +1,36 @@
 import React from 'react'
-import { View, Platform, StyleSheet } from 'react-native'
+import { View, Platform, StyleSheet, ScrollView, RefreshControl } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { colors } from '../utils/index'
+import  { useEffect, useState, useCallback } from 'react';
 
 export default function ReloadIcon({load}) {
-    const reloadIconName = Platform.OS == 'ios' ? 'ios-refresh' : 'md-refresh'
+    // 更新処理を行っているかどうか
+    const [refreshing, setRefreshing] = useState(false);
+
+    const sleep = msec => new Promise(resolve => setTimeout(resolve, msec));
+
+    // 任意の更新処理
+    const reload = useCallback(async () => {
+        let abortCtrl = new AbortController()
+
+        setRefreshing(true);
+        // 非同期処理(実際にはここでデータの更新を行う)
+        await sleep(1000);
+        await load();
+        setRefreshing(false);
+        return () => {
+            abortCtrl.abort()
+          }
+    }, []);
+
     return (
-        <View style={styles.reloadIcon}>
-            <Ionicons onPress={load} name = {reloadIconName} size = {24} color = {colors.PRIMARY_COLOR} />
-        </View>
-    )
+        <ScrollView
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={reload} />
+          }>
+        </ScrollView>
+      );
 }
 
 const styles = StyleSheet.create ({

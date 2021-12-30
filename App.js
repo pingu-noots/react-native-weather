@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, ActivityIndicator, ScrollView, RefreshControl} from 'react-native';
 import * as Location from 'expo-location';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 
 import WeatherInfo from './components/WeatherInfo'
 import UnitsPicker  from './components/UnitsPicker';
@@ -21,6 +21,7 @@ export default function App() {
   useEffect(() =>{
     load()
   }, [unitsSystem])
+
   async function load() {
     setCurrentWeather(null)
     setErrorMessage(null)
@@ -51,6 +52,7 @@ export default function App() {
       setErrorMessage(error.message)
     }
   }
+
   if (currentWeather) {
     return (
       <View style={styles.container}>
